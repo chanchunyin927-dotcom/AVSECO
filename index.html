@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <title>保安挑戰 - 命運輪盤</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #2c3e50; color: white; padding: 20px; }
+        #wheel { width: 300px; height: 300px; border: 10px solid #fff; border-radius: 50%; margin: 20px auto; 
+                 display: flex; align-items: center; justify-content: center; background: conic-gradient(red 0deg 72deg, blue 72deg 144deg, green 144deg 216deg, orange 216deg 288deg, purple 288deg 360deg);
+                 cursor: pointer; transition: transform 3s ease-out; font-weight: bold; }
+        .hidden { display: none; }
+        #quiz-box { background: white; color: black; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; }
+        button { padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <h1>機場保安挑戰</h1>
+    <div id="wheel" onclick="spin()">點擊轉盤開始！</div>
+    
+    <div id="quiz-box" class="hidden">
+        <h2 id="q-text"></h2>
+        <div id="options"></div>
+        <button onclick="reset()">再轉一次</button>
+    </div>
+
+    <script>
+        const questions = [
+            {q: "通行證「E」字批註代表？", a: ["行李大堂", "訪客區"], correct: 0},
+            {q: "發現可疑人士請致電？", a: ["2183-9074", "999"], correct: 0}
+        ];
+
+        function spin() {
+            const wheel = document.getElementById('wheel');
+            wheel.style.transform = `rotate(${Math.floor(Math.random() * 3600)}deg)`;
+            setTimeout(() => {
+                document.getElementById('wheel').classList.add('hidden');
+                document.getElementById('quiz-box').classList.remove('hidden');
+                loadQ();
+            }, 3000);
+        }
+
+        function loadQ() {
+            const q = questions[Math.floor(Math.random() * questions.length)];
+            document.getElementById('q-text').innerText = q.q;
+            const opt = document.getElementById('options');
+            opt.innerHTML = '';
+            q.a.forEach((txt, i) => {
+                let b = document.createElement('button');
+                b.innerText = txt;
+                b.onclick = () => alert(i === q.correct ? "答對了！" : "錯了！");
+                opt.appendChild(b);
+            });
+        }
+
+        function reset() {
+            document.getElementById('wheel').classList.remove('hidden');
+            document.getElementById('quiz-box').classList.add('hidden');
+        }
+    </script>
+</body>
+</html>
