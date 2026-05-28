@@ -1,61 +1,66 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="zh-HK">
-<head> 
-    <meta charset="UTF-8"> 
-    <title>保安挑戰 - 命運輪盤</title>
+<head>
+    <meta charset="UTF-8">
+    <title>保安專家挑戰賽</title>
     <style>
         body { font-family: sans-serif; text-align: center; background: #2c3e50; color: white; padding: 20px; }
-        #wheel { width: 300px; height: 300px; border: 10px solid #fff; border-radius: 50%; margin: 20px auto; 
-                 display: flex; align-items: center; justify-content: center; background: conic-gradient(red 0deg 72deg, blue 72deg 144deg, green 144deg 216deg, orange 216deg 288deg, purple 288deg 360deg);
-                 cursor: pointer; transition: transform 3s ease-out; font-weight: bold; }
+        #wheel { width: 250px; height: 250px; border: 10px solid #f1c40f; border-radius: 50%; margin: 20px auto; display: flex; align-items: center; justify-content: center; cursor: pointer; background: conic-gradient(red 0deg 72deg, blue 72deg 144deg, green 144deg 216deg, orange 216deg 288deg, purple 288deg 360deg); }
         .hidden { display: none; }
         #quiz-box { background: white; color: black; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; }
-        button { padding: 10px 20px; cursor: pointer; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
     </style>
 </head>
 <body>
-
     <h1>機場保安挑戰</h1>
-    <div id="wheel" onclick="spin()">點擊轉盤開始！</div>
+    <div id="wheel" onclick="spin()">點擊轉盤抽類別</div>
     
     <div id="quiz-box" class="hidden">
-        <h2 id="q-text"></h2>
+        <h3 id="category-title"></h3>
+        <p id="q-text"></p>
         <div id="options"></div>
-        <button onclick="reset()">再轉一次</button>
+        <p id="status"></p>
     </div>
 
     <script>
-        const questions = [
-            {q: "通行證「E」字批註代表？", a: ["行李大堂", "訪客區"], correct: 0},
-            {q: "發現可疑人士請致電？", a: ["2183-9074", "999"], correct: 0}
-        ];
+        const quizData = {
+            "禁區管制": [
+                {q: "禁區門應保持？", a: ["關閉", "開啟"], correct: 0},
+                // ... 這裡請填入你的 5 題題目
+            ]
+        };
+        
+        let currentCat = "", qIndex = 0, score = 0;
 
         function spin() {
-            const wheel = document.getElementById('wheel');
-            wheel.style.transform = `rotate(${Math.floor(Math.random() * 3600)}deg)`;
-            setTimeout(() => {
-                document.getElementById('wheel').classList.add('hidden');
-                document.getElementById('quiz-box').classList.remove('hidden');
-                loadQ();
-            }, 3000);
+            const cats = Object.keys(quizData);
+            currentCat = cats[Math.floor(Math.random() * cats.length)];
+            document.getElementById('wheel').classList.add('hidden');
+            document.getElementById('quiz-box').classList.remove('hidden');
+            qIndex = 0; score = 0;
+            loadQuestion();
         }
 
-        function loadQ() {
-            const q = questions[Math.floor(Math.random() * questions.length)];
+        function loadQuestion() {
+            if(qIndex >= 5) {
+                alert(score >= 4 ? "恭喜！請領取禮品。" : "可惜未達標，再接再厲！");
+                location.reload(); return;
+            }
+            const q = quizData[currentCat][qIndex];
+            document.getElementById('category-title').innerText = "類別：" + currentCat;
             document.getElementById('q-text').innerText = q.q;
             const opt = document.getElementById('options');
             opt.innerHTML = '';
             q.a.forEach((txt, i) => {
                 let b = document.createElement('button');
                 b.innerText = txt;
-                b.onclick = () => alert(i === q.correct ? "答對了！" : "錯了！");
+                b.onclick = () => {
+                    if(i === q.correct) score++;
+                    qIndex++;
+                    loadQuestion();
+                };
                 opt.appendChild(b);
             });
-        }
-
-        function reset() {
-            document.getElementById('wheel').classList.remove('hidden');
-            document.getElementById('quiz-box').classList.add('hidden');
         }
     </script>
 </body>
