@@ -5,43 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>機場禁區通行證基本知識小測試</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            margin: 0; padding: 20px;
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: white; 
-            text-align: center; 
-            min-height: 100vh;
-        }
+    body { 
+        font-family: 'Segoe UI', Helvetica, Arial, sans-serif; 
+        margin: 0; padding: 20px;
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('bg.jpg');
+        background-size: cover;
+        background-position: center;
+        background-attachment: fixed;
+        color: white; 
+        text-align: center; 
+        min-height: 100vh;
+    }
 
-        .card { 
-            background: rgba(26, 42, 108, 0.85); 
-            border: 2px solid #c5a059; 
-            padding: 30px; 
-            border-radius: 20px; 
-            margin: 20px auto; 
-            max-width: 400px;
-            backdrop-filter: blur(5px);
-        }
+    .card { 
+        /* 將純藍改為「深藍到深黑的漸層」，質感更好 */
+        background: linear-gradient(180deg, #1a2a6c 0%, #050a20 100%); 
+        border: 2px solid #c5a059; 
+        padding: 25px; 
+        border-radius: 25px; 
+        margin: 20px auto; 
+        max-width: 450px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
 
-        #card-img { width: 100%; max-width: 220px; border-radius: 12px; margin-bottom: 20px; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-        button { padding: 15px; border: 1px solid #555; border-radius: 10px; background: #333; color: white; cursor: pointer; transition: 0.3s; }
-        
-        /* 加入你想要的金色光暈效果 */
-        button.selected { 
-            background: #c5a059; 
-            border-color: #fff; 
-            font-weight: bold; 
-            box-shadow: 0 0 15px #c5a059;
-            transform: scale(1.05);
-        }
-        
-        #submit-btn { margin-top: 25px; padding: 15px 40px; background: #27ae60; border: none; font-size: 1.2em; border-radius: 50px; width: 100%; }
-    </style>
+    /* 標題與內文放大 */
+    h1 { font-size: 1.6em; margin-bottom: 20px; }
+    #card-title { font-size: 1.8em; color: #f1c40f; margin-bottom: 15px; }
+    p { font-size: 1.1em; color: #dcdcdc; }
+
+    /* 按鈕文字放大，並增加點擊感 */
+    button { 
+        padding: 18px; /* 增加觸控區 */
+        font-size: 1.1em; /* 字型變大 */
+        border: 2px solid #444; 
+        border-radius: 12px; 
+        background: #2c3e50; 
+        color: white; 
+        cursor: pointer; 
+        transition: 0.3s;
+    }
+
+    button.selected { 
+        background: #c5a059; 
+        border-color: #fff; 
+        font-weight: bold; 
+        box-shadow: 0 0 20px #c5a059;
+        transform: scale(1.02);
+    }
+
+    #submit-btn { 
+        margin-top: 30px; 
+        padding: 20px; 
+        background: linear-gradient(90deg, #27ae60, #2ecc71); 
+        border: none; 
+        font-size: 1.3em; 
+        font-weight: bold;
+        border-radius: 50px; 
+        width: 100%;
+        color: white;
+    }
+</style>
 </head>
 <body>
 
