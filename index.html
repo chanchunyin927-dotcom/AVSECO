@@ -6,24 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>機場禁區通行證基本知識小測試</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Helvetica, Arial, sans-serif; 
-            margin: 0; padding: 20px;
-            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('bg.jpg');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            color: white; text-align: center; min-height: 100vh;
-        }
-        .card { 
-            background: linear-gradient(180deg, #1a2a6c 0%, #050a20 100%); 
-            border: 2px solid #c5a059; padding: 25px; border-radius: 25px; 
-            margin: 20px auto; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(5px);
-        }
+        body { font-family: 'Segoe UI', Helvetica, Arial, sans-serif; margin: 0; padding: 20px; background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('bg.jpg'); background-size: cover; background-position: center; background-attachment: fixed; color: white; text-align: center; min-height: 100vh; }
+        .card { background: linear-gradient(180deg, #1a2a6c 0%, #050a20 100%); border: 2px solid #c5a059; padding: 25px; border-radius: 25px; margin: 20px auto; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
         h1 { font-size: 1.5em; margin-bottom: 20px; }
         #card-title { font-size: 1.8em; color: #f1c40f; margin-bottom: 10px; }
-        #feedback { height: 30px; font-weight: bold; margin: 10px 0; font-size: 1.2em; }
         .grid { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
         button { width: 100%; padding: 18px; font-size: 1.1em; border: 2px solid #444; border-radius: 12px; background: #2c3e50; color: white; cursor: pointer; transition: 0.3s; }
         button.selected { background: #c5a059; border-color: #fff; box-shadow: 0 0 20px #c5a059; transform: scale(1.02); }
@@ -34,10 +20,10 @@
 <body>
 
     <h1>機場禁區通行證基本知識小測試</h1>
-    <div class="card">
+    <div class="card" id="main-card">
         <img id="card-img" src="紅證.png" alt="通行證">
         <h2 id="card-title">紅色通行證</h2>
-        <div id="feedback"></div> 
+        <p>此證可進入哪些區域？(可選多個)</p>
         
         <div class="grid" id="area-options">
             <button onclick="toggle(this)" data-id="0">客運大樓</button>
@@ -63,64 +49,57 @@
         { cardName: "杏色通行證", imgSrc: "杏證.png", correct: [3] }
     ];
 
-    // 建立選項 ID 對應文字的清單
-    const areaNames = {
-        0: "客運大樓", 1: "客運停機坪", 2: "貨運停機坪", 
-        3: "維修基地及長期停機坪", 4: "跑道及滑行道", 
-        5: "所有區域 (含跑道/滑行道)", 6: "所有區域 (不含跑道/滑行道)"
-    };
+    const areaNames = { 0: "客運大樓", 1: "客運停機坪", 2: "貨運停機坪", 3: "維修基地及長期停機坪", 4: "跑道及滑行道", 5: "所有區域 (含跑道/滑行道)", 6: "所有區域 (不含跑道/滑行道)" };
 
     let gamePool = [...allChallenges].sort(() => 0.5 - Math.random()).slice(0, 5);
     let currentIdx = 0;
     let score = 0;
 
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('card-title').innerText = gamePool[0].cardName;
-        document.getElementById('card-img').src = gamePool[0].imgSrc;
-    });
-
     function toggle(btn) { btn.classList.toggle('selected'); }
+
+    function loadNext() {
+        currentIdx++;
+        if (currentIdx < 5) {
+            document.getElementById('card-title').innerText = gamePool[currentIdx].cardName;
+            document.getElementById('card-img').src = gamePool[currentIdx].imgSrc;
+            document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            let message = score === 5 ? "🎉 完美表現！你是保安專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對機場保安非常重要。" : "不錯！繼續保持！");
+            if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
+
+            document.getElementById('main-card').innerHTML = `
+                <h2>挑戰完成！</h2>
+                <p style="font-size: 1.2em;">${message}</p>
+                <p style="font-size: 2em; margin: 20px 0;">得分：<strong>${score} / 5</strong></p>
+                <button onclick="location.reload()" style="background:#c5a059; padding: 15px; border-radius: 50px; border:none; color:white; width:100%;">重新挑戰</button>
+            `;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
 
     function submit() {
         const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
         const correct = gamePool[currentIdx].correct;
         const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
         
-        const feedback = document.getElementById('feedback');
-        
         if (isMatch) {
             score++;
-            feedback.innerText = "✅ 正確！";
-            feedback.style.color = "#2ecc71";
+            document.getElementById('main-card').innerHTML = `
+                <h2 style="color:#2ecc71;">✅ 正確！</h2>
+                <p>這一題回答正確。</p>
+                <button onclick="loadNext()" style="background:#27ae60; padding:15px; border-radius:12px; border:none; color:white; width:100%;">下一題</button>
+            `;
         } else {
-            // 找出正確答案的文字組合
             const correctText = correct.map(id => areaNames[id]).join("、");
-            feedback.innerHTML = `<span style="font-size: 0.9em;">❌ 錯誤！正確為：${correctText}</span>`;
-            feedback.style.color = "#e74c3c";
+            document.getElementById('main-card').innerHTML = `
+                <h2 style="color:#e74c3c;">❌ 錯誤</h2>
+                <p>正確答案是：</p>
+                <div style="background:#444; padding:15px; border-radius:10px; margin:15px 0;">${correctText}</div>
+                <button onclick="loadNext()" style="background:#c5a059; padding:15px; border-radius:12px; border:none; color:white; width:100%;">下一題</button>
+            `;
         }
-
-        // 延遲 2 秒（稍微延長一點讓員工看完正確答案）
-        setTimeout(() => {
-            currentIdx++;
-            feedback.innerText = "";
-            if (currentIdx < 5) {
-                document.getElementById('card-title').innerText = gamePool[currentIdx].cardName;
-                document.getElementById('card-img').src = gamePool[currentIdx].imgSrc;
-                document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } else {
-                let message = score === 5 ? "🎉 完美表現！你是保安專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對機場保安非常重要。" : "不錯！繼續保持！");
-                if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
-
-                document.querySelector('.card').innerHTML = `
-                    <h2>挑戰完成！</h2>
-                    <p style="font-size: 1.2em;">${message}</p>
-                    <p style="font-size: 2em; margin: 20px 0;">得分：<strong>${score} / 5</strong></p>
-                    <button onclick="location.reload()" style="background:#c5a059; padding: 15px 30px; border-radius: 50px; border:none; color:white; font-size:1.1em; cursor:pointer;">重新挑戰</button>
-                `;
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        }, 2000); // 這裡改成了 2000 毫秒 (2秒)，方便閱讀答案
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 </script>
 </body>
