@@ -53,10 +53,17 @@
 
     const areaNames = { 0: "客運大樓", 1: "客運停機坪", 2: "貨運停機坪", 3: "維修基地及長期停機坪", 4: "跑道及滑行道", 5: "所有區域 (含跑道/滑行道)", 6: "所有區域 (不含跑道/滑行道)" };
 
-    // 【固定遊戲池】在遊戲開始前先隨機打亂並選好 5 題
+    // 【固定遊戲池】
     let gamePool = [...allChallenges].sort(() => 0.5 - Math.random()).slice(0, 5);
     let currentIdx = 0;
     let score = 0;
+
+    // --- 【關鍵增加】頁面一讀取，強制載入隨機的第一題 ---
+    document.addEventListener('DOMContentLoaded', () => {
+        const firstQ = gamePool[0];
+        document.getElementById('card-title').innerText = firstQ.cardName;
+        document.getElementById('card-img').src = firstQ.imgSrc;
+    });
 
     function toggle(btn) { btn.classList.toggle('selected'); }
 
@@ -82,14 +89,11 @@
         currentIdx++;
         if (currentIdx < 5) {
             document.getElementById('feedback').innerText = "";
-            
-            // 【關鍵修改】確保讀取的是已經排好序的 gamePool
             const nextQ = gamePool[currentIdx]; 
             
             document.getElementById('card-title').innerText = nextQ.cardName;
             document.getElementById('card-img').src = nextQ.imgSrc;
             
-            // 重新生成按鈕區塊
             document.getElementById('question-area').innerHTML = `
                 <p>此證可進入哪些區域？(可選多於一個答案)</p>
                 <div class="grid">${[0,1,2,3,4,5,6].map(id => `<button onclick="toggle(this)" data-id="${id}">${areaNames[id]}</button>`).join('')}</div>
