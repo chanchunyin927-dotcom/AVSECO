@@ -10,20 +10,22 @@
         .card { background: linear-gradient(180deg, #1a2a6c 0%, #050a20 100%); border: 2px solid #c5a059; padding: 25px; border-radius: 25px; margin: 20px auto; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(5px); }
         h1 { font-size: 1.5em; margin-bottom: 20px; }
         #card-title { font-size: 1.8em; color: #f1c40f; margin-bottom: 10px; }
+        #feedback { height: 50px; font-weight: bold; margin: 10px 0; font-size: 1.3em; display: flex; align-items: center; justify-content: center; }
         .grid { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
         button { width: 100%; padding: 18px; font-size: 1.1em; border: 2px solid #444; border-radius: 12px; background: #2c3e50; color: white; cursor: pointer; transition: 0.3s; }
         button.selected { background: #c5a059; border-color: #fff; box-shadow: 0 0 20px #c5a059; transform: scale(1.02); }
-        #submit-btn { margin-top: 30px; padding: 20px; background: linear-gradient(90deg, #27ae60, #2ecc71); border: none; font-size: 1.3em; border-radius: 50px; width: 100%; color: white; }
+        #submit-btn { margin-top: 20px; padding: 18px; background: linear-gradient(90deg, #27ae60, #2ecc71); border: none; font-size: 1.2em; border-radius: 50px; width: 100%; color: white; }
         #card-img { width: 100%; max-width: 220px; border-radius: 12px; margin-bottom: 20px; border: 3px solid #fff; }
     </style>
 </head>
 <body>
 
     <h1>機場禁區通行證基本知識小測試</h1>
-    <div id="game-container">
-        <div class="card" id="main-card">
-            <img id="card-img" src="紅證.png" alt="通行證">
-            <h2 id="card-title">紅色通行證</h2>
+    <div class="card" id="main-card">
+        <img id="card-img" src="紅證.png" alt="通行證">
+        <h2 id="card-title">紅色通行證</h2>
+        <div id="feedback"></div>
+        <div id="question-area">
             <p>此證可進入哪些區域？(可選多個)</p>
             <div class="grid" id="area-options">
                 <button onclick="toggle(this)" data-id="0">客運大樓</button>
@@ -57,59 +59,50 @@
 
     function toggle(btn) { btn.classList.toggle('selected'); }
 
-    // 重新渲染題目的函數 (把原本的結構塞回去)
-    function renderQuestion() {
-        document.getElementById('game-container').innerHTML = `
-            <div class="card" id="main-card">
-                <img id="card-img" src="${gamePool[currentIdx].imgSrc}" alt="通行證">
-                <h2 id="card-title">${gamePool[currentIdx].cardName}</h2>
-                <p>此證可進入哪些區域？(可選多個)</p>
-                <div class="grid" id="area-options">
-                    ${[0,1,2,3,4,5,6].map(id => `<button onclick="toggle(this)" data-id="${id}">${areaNames[id]}</button>`).join('')}
-                </div>
-                <button id="submit-btn" onclick="submit()">提交答案</button>
-            </div>
-        `;
-    }
-
     function submit() {
         const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
         const correct = gamePool[currentIdx].correct;
         const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
-        
+        const feedback = document.getElementById('feedback');
+
         if (isMatch) {
             score++;
-            currentIdx++;
-            if (currentIdx < 5) renderQuestion();
-            else showResult();
+            feedback.innerHTML = `<span style="color:#2ecc71;">✅ 正確！</span>`;
+            document.getElementById('question-area').style.display = 'none'; // 隱藏按鈕，避免重複提交
+            setTimeout(nextQuestion, 1000);
         } else {
             const correctText = correct.map(id => areaNames[id]).join("、");
-            document.getElementById('main-card').innerHTML = `
-                <h2 style="color:#e74c3c;">❌ 錯誤</h2>
-                <p>正確答案是：</p>
-                <div style="background:#444; padding:15px; border-radius:10px; margin:15px 0;">${correctText}</div>
-                <button onclick="nextStep()" style="background:#c5a059; padding:15px; border-radius:12px; border:none; color:white; width:100%;">下一題</button>
-            `;
+            feedback.innerHTML = `<span style="color:#e74c3c;">❌ 錯誤！正確為：${correctText}</span>`;
+            document.getElementById('question-area').innerHTML = `<button id="submit-btn" onclick="nextQuestion()">下一題</button>`;
         }
     }
 
-    function nextStep() {
+    function nextQuestion() {
         currentIdx++;
-        if (currentIdx < 5) renderQuestion();
-        else showResult();
+        if (currentIdx < 5) {
+            document.getElementById('feedback').innerText = "";
+            document.getElementById('card-title').innerText = gamePool[currentIdx].cardName;
+            document.getElementById('card-img').src = gamePool[currentIdx].imgSrc;
+            document.getElementById('question-area').innerHTML = `
+                <p>此證可進入哪些區域？(可選多個)</p>
+                <div class="grid">${[0,1,2,3,4,5,6].map(id => `<button onclick="toggle(this)" data-id="${id}">${areaNames[id]}</button>`).join('')}</div>
+                <button id="submit-btn" onclick="submit()">提交答案</button>
+            `;
+            document.getElementById('question-area').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+            showResult();
+        }
     }
 
     function showResult() {
         let message = score === 5 ? "🎉 完美表現！你是保安專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對機場保安非常重要。" : "不錯！繼續保持！");
         if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
-
-        document.getElementById('game-container').innerHTML = `
-            <div class="card">
-                <h2>挑戰完成！</h2>
-                <p style="font-size: 1.2em;">${message}</p>
-                <p style="font-size: 2em; margin: 20px 0;">得分：<strong>${score} / 5</strong></p>
-                <button onclick="location.reload()" style="background:#c5a059; padding:15px; border-radius:50px; border:none; color:white; width:100%;">重新挑戰</button>
-            </div>
+        document.getElementById('main-card').innerHTML = `
+            <h2>挑戰完成！</h2>
+            <p style="font-size: 1.2em;">${message}</p>
+            <p style="font-size: 2em; margin: 20px 0;">得分：<strong>${score} / 5</strong></p>
+            <button onclick="location.reload()" style="background:#c5a059; padding:15px; border-radius:50px; border:none; color:white; width:100%;">重新挑戰</button>
         `;
     }
 </script>
