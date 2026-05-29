@@ -18,44 +18,66 @@ HTML
 
     <h1>通行證權限驗證</h1>
     <div class="card">
-        <h2 id="card-name">黃色通行證</h2>
-        <p>此證可進入哪些區域？(可選多個)</p>
-        <div class="grid" id="area-options">
-            <button onclick="toggle(this)" data-id="0">客運大樓</button>
-            <button onclick="toggle(this)" data-id="1">停機坪</button>
-            <button onclick="toggle(this)" data-id="2">長期停坪區</button>
-            <button onclick="toggle(this)" data-id="3">貨運區</button>
-        </div>
-        <button id="submit-btn" onclick="submit()">提交驗證</button>
+    <img id="card-img" src="B.png" style="width: 100%; max-width: 200px; border-radius: 8px;">
+    
+    <h2 id="card-title">紅色通行證 (B, D, E)</h2>
+    <p>此證可進入哪些區域？(可選多個)</p>
+    
+    <div class="grid" id="area-options">
+        <button onclick="toggle(this)" data-id="0">客運大樓</button>
+        <button onclick="toggle(this)" data-id="1">停機坪</button>
+        <button onclick="toggle(this)" data-id="2">長期停坪區</button>
+        <button onclick="toggle(this)" data-id="3">貨運區</button>
     </div>
+    
+    <button id="submit-btn" onclick="submit()">提交驗證</button>
+</div>
 
-    <script>
-        // 設定規則：證件名稱 與 其正確的區域代號
-        const rules = [
-            { card: "黃色通行證", correct: [0] }, 
-            { card: "橙色通行證", correct: [1, 2] }
-        ];
-        
-        let currentIdx = 0;
-        
-        function toggle(btn) {
-            btn.classList.toggle('selected');
+<script>
+    // 這裡定義你的題目資料，包含證件圖片檔名
+    const challenges = [
+        { 
+            cardName: "紅色通行證 (B, D, E)", 
+            imgSrc: "B.png", 
+            correct: [0, 1, 2] // 對應下面選項的索引值
+        },
+        { 
+            cardName: "藍色通行證 (A)", 
+            imgSrc: "A.png", // 記得之後上傳這張圖
+            correct: [3] 
         }
+    ];
+    
+    let currentIdx = 0;
+    
+    // 選取/取消選取的邏輯
+    function toggle(btn) {
+        btn.classList.toggle('selected');
+    }
 
-        function submit() {
-            const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
-            const correct = rules[currentIdx].correct;
-            
-            // 驗證邏輯：檢查選取的數量是否一致，且內容是否相符
-            const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
-            
-            alert(isMatch ? "✅ 正確！權限核准。" : "❌ 權限不符，請重新核對。");
-            
-            // 準備下一題
-            currentIdx = (currentIdx + 1) % rules.length;
-            document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-            document.getElementById('card-name').innerText = rules[currentIdx].card;
+    function submit() {
+        const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
+        const correct = challenges[currentIdx].correct;
+        
+        // 驗證是否完全正確
+        const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
+        
+        if (isMatch) {
+            alert("✅ 正確！權限核准。");
+        } else {
+            alert("❌ 權限不符，請重新核對批註！");
         }
-    </script>
+        
+        // 切換到下一關
+        currentIdx = (currentIdx + 1) % challenges.length;
+        
+        // 更新畫面上的圖片與標題
+        document.getElementById('card-title').innerText = challenges[currentIdx].cardName;
+        document.getElementById('card-img').src = challenges[currentIdx].imgSrc;
+        
+        // 清除所有已選按鈕
+        document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+    }
+</script>
 </body>
 </html>
