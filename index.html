@@ -1,4 +1,3 @@
-HTML
 <!DOCTYPE html>
 <html lang="zh-HK">
 <head>
@@ -8,55 +7,53 @@ HTML
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
         .card { background: #1a2a6c; border: 2px solid #c5a059; padding: 30px; border-radius: 20px; margin: 20px auto; max-width: 400px; }
+        
+        /* 統一圖片樣式 */
+        #card-img { width: 100%; max-width: 220px; border-radius: 12px; margin-bottom: 20px; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         button { padding: 15px; border: 1px solid #555; border-radius: 10px; background: #333; color: white; cursor: pointer; transition: 0.3s; }
-        button.selected { background: #c5a059; border-color: #fff; }
-        #submit-btn { margin-top: 20px; padding: 15px 40px; background: #27ae60; border: none; font-size: 1.2em; border-radius: 50px; }
+        button.selected { background: #c5a059; border-color: #fff; font-weight: bold; }
+        #submit-btn { margin-top: 25px; padding: 15px 40px; background: #27ae60; border: none; font-size: 1.2em; border-radius: 50px; width: 100%; }
     </style>
 </head>
 <body>
 
-    <h1>通行證權限驗證</h1>
+    <h1>保安權限驗證系統</h1>
     <div class="card">
-    <img id="card-img" src="紅證.png" style="width: 100%; max-width: 200px; border-radius: 8px;">
-    <img id="card-img" src="藍證.png" style="width: 100%; max-width: 200px; border-radius: 8px;">
-    <img id="card-img" src="杏證.png" style="width: 100%; max-width: 200px; border-radius: 8px;">
-    <img id="card-img" src="橙證.png" style="width: 100%; max-width: 200px; border-radius: 8px;">
-    <img id="card-img" src="黃證.png" style="width: 100%; max-width: 200px; border-radius: 8px;">
-    <img id="card-img" src="綠證.png" style="width: 100%; max-width: 200px; border-radius: 8px;">
-    <img id="card-img" src="紫證.png" style="width: 100%; max-width: 200px; border-radius: 8px;">
-    
-    <h2 id="card-title">紅色通行證 (B, D, E)</h2>
-    <p>此證可進入哪些區域？(可選多個)</p>
-    
-    <div class="grid" id="area-options">
-        <button onclick="toggle(this)" data-id="0">客運大樓</button>
-        <button onclick="toggle(this)" data-id="1">停機坪</button>
-        <button onclick="toggle(this)" data-id="2">長期停坪區</button>
-        <button onclick="toggle(this)" data-id="3">貨運區</button>
+        <img id="card-img" src="紅證.png" alt="通行證">
+        
+        <h2 id="card-title">紅色通行證</h2>
+        <p>此證可進入哪些區域？(可選多個)</p>
+        
+        <div class="grid" id="area-options">
+            <button onclick="toggle(this)" data-id="0">客運大樓</button>
+            <button onclick="toggle(this)" data-id="1">客運停機坪</button>
+            <button onclick="toggle(this)" data-id="2">貨運停機坪</button>
+            <button onclick="toggle(this)" data-id="3">維修基地及長期停機坪</button>
+            <button onclick="toggle(this)" data-id="4">跑道及滑行道</button>
+            <button onclick="toggle(this)" data-id="5">所有區域，包括跑道及滑行道</button>
+            <button onclick="toggle(this)" data-id="6">所有區域，但不包括跑道及滑行道</button>
+        </div>
+        
+        <button id="submit-btn" onclick="submit()">提交驗證</button>
     </div>
-    
-    <button id="submit-btn" onclick="submit()">提交驗證</button>
-</div>
 
 <script>
-    // 這裡定義你的題目資料，包含證件圖片檔名
+    // 定義所有關卡：imgSrc 必須與你上傳到 GitHub 的檔名完全一致
     const challenges = [
-        { 
-            cardName: "紅色通行證 (B, D, E)", 
-            imgSrc: "B.png", 
-            correct: [0, 1, 2] // 對應下面選項的索引值
-        },
-        { 
-            cardName: "藍色通行證 (A)", 
-            imgSrc: "A.png", // 記得之後上傳這張圖
-            correct: [3] 
-        }
+        { cardName: "紅色通行證", imgSrc: "紅證.png", correct: [5] },
+        { cardName: "紫色通行證", imgSrc: "紫證.png", correct: [6] },
+        { cardName: "黃色通行證", imgSrc: "黃證.png", correct: [0] }
+        { cardName: "橙色通行證", imgSrc: "橙證.png", correct: [1,2,3] }
+    { cardName: "綠色通行證", imgSrc: "綠證.png", correct: [1,2,3,4] }
+    { cardName: "藍色通行證", imgSrc: "藍證.png", correct: [2] }
+    { cardName: "杏色通行證", imgSrc: "杏證.png", correct: [3] }
+        // 之後你可以繼續在這裡增加其他證件的規則
     ];
     
     let currentIdx = 0;
     
-    // 選取/取消選取的邏輯
     function toggle(btn) {
         btn.classList.toggle('selected');
     }
@@ -65,7 +62,6 @@ HTML
         const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
         const correct = challenges[currentIdx].correct;
         
-        // 驗證是否完全正確
         const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
         
         if (isMatch) {
@@ -77,11 +73,11 @@ HTML
         // 切換到下一關
         currentIdx = (currentIdx + 1) % challenges.length;
         
-        // 更新畫面上的圖片與標題
+        // 更新畫面
         document.getElementById('card-title').innerText = challenges[currentIdx].cardName;
         document.getElementById('card-img').src = challenges[currentIdx].imgSrc;
         
-        // 清除所有已選按鈕
+        // 重置按鈕
         document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
     }
 </script>
