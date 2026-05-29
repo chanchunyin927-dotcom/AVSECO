@@ -12,68 +12,22 @@
             background-size: cover;
             background-position: center;
             background-attachment: fixed;
-            color: white; 
-            text-align: center; 
-            min-height: 100vh;
+            color: white; text-align: center; min-height: 100vh;
         }
-
         .card { 
             background: linear-gradient(180deg, #1a2a6c 0%, #050a20 100%); 
-            border: 2px solid #c5a059; 
-            padding: 25px; 
-            border-radius: 25px; 
-            margin: 20px auto; 
-            max-width: 450px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 2px solid #c5a059; padding: 25px; border-radius: 25px; 
+            margin: 20px auto; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             backdrop-filter: blur(5px);
         }
-
-        h1 { font-size: 1.5em; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        h1 { font-size: 1.5em; margin-bottom: 20px; }
         #card-title { font-size: 1.8em; color: #f1c40f; margin-bottom: 10px; }
-        p { font-size: 1.1em; color: #dcdcdc; margin-bottom: 20px; }
-
-        /* 這裡修正了排版：使用 flex 垂直排列，確保整齊 */
-        .grid { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-            margin-top: 10px; 
-        }
-
-        button { 
-            width: 100%;
-            padding: 18px; 
-            font-size: 1.1em; 
-            border: 2px solid #444; 
-            border-radius: 12px; 
-            background: #2c3e50; 
-            color: white; 
-            cursor: pointer; 
-            transition: 0.3s;
-        }
-
-        button.selected { 
-            background: #c5a059; 
-            border-color: #fff; 
-            font-weight: bold; 
-            box-shadow: 0 0 20px #c5a059;
-            transform: scale(1.02);
-        }
-
-        #submit-btn { 
-            margin-top: 30px; 
-            padding: 20px; 
-            background: linear-gradient(90deg, #27ae60, #2ecc71); 
-            border: none; 
-            font-size: 1.3em; 
-            font-weight: bold;
-            border-radius: 50px; 
-            width: 100%;
-            color: white;
-            cursor: pointer;
-        }
-
-        #card-img { width: 100%; max-width: 220px; border-radius: 12px; margin-bottom: 20px; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+        #feedback { height: 30px; font-weight: bold; margin: 10px 0; font-size: 1.2em; }
+        .grid { display: flex; flex-direction: column; gap: 12px; margin-top: 10px; }
+        button { width: 100%; padding: 18px; font-size: 1.1em; border: 2px solid #444; border-radius: 12px; background: #2c3e50; color: white; cursor: pointer; transition: 0.3s; }
+        button.selected { background: #c5a059; border-color: #fff; box-shadow: 0 0 20px #c5a059; transform: scale(1.02); }
+        #submit-btn { margin-top: 30px; padding: 20px; background: linear-gradient(90deg, #27ae60, #2ecc71); border: none; font-size: 1.3em; border-radius: 50px; width: 100%; color: white; }
+        #card-img { width: 100%; max-width: 220px; border-radius: 12px; margin-bottom: 20px; border: 3px solid #fff; }
     </style>
 </head>
 <body>
@@ -81,18 +35,15 @@
     <h1>機場禁區通行證基本知識小測試</h1>
     <div class="card">
         <img id="card-img" src="紅證.png" alt="通行證">
-        
         <h2 id="card-title">紅色通行證</h2>
-        <p>此證可進入哪些區域？(可選多個)</p>
-        
-        <div class="grid" id="area-options">
+        <div id="feedback"></div> <div class="grid" id="area-options">
             <button onclick="toggle(this)" data-id="0">客運大樓</button>
             <button onclick="toggle(this)" data-id="1">客運停機坪</button>
             <button onclick="toggle(this)" data-id="2">貨運停機坪</button>
             <button onclick="toggle(this)" data-id="3">維修基地及長期停機坪</button>
             <button onclick="toggle(this)" data-id="4">跑道及滑行道</button>
-            <button onclick="toggle(this)" data-id="5">所有區域，包括跑道及滑行道</button>
-            <button onclick="toggle(this)" data-id="6">所有區域，但不包括跑道及滑行道</button>
+            <button onclick="toggle(this)" data-id="5">所有區域 (含跑道/滑行道)</button>
+            <button onclick="toggle(this)" data-id="6">所有區域 (不含跑道/滑行道)</button>
         </div>
         
         <button id="submit-btn" onclick="submit()">提交答案</button>
@@ -109,39 +60,46 @@
         { cardName: "杏色通行證", imgSrc: "杏證.png", correct: [3] }
     ];
 
-    // 隨機抽取 5 種證件
     let gamePool = [...allChallenges].sort(() => 0.5 - Math.random()).slice(0, 5);
     let currentIdx = 0;
     let score = 0;
 
-    function toggle(btn) {
-        btn.classList.toggle('selected');
-    }
+    function toggle(btn) { btn.classList.toggle('selected'); }
 
     function submit() {
         const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
         const correct = gamePool[currentIdx].correct;
-        
-        // 檢查答案是否正確
         const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
-        if (isMatch) score++;
-
-        // 檢查是否還有下一題
-        currentIdx++;
         
-        if (currentIdx < 5) {
-            // 更新題目
-            document.getElementById('card-title').innerText = gamePool[currentIdx].cardName;
-            document.getElementById('card-img').src = gamePool[currentIdx].imgSrc;
-            document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+        // 顯示結果在介面上，不用彈窗
+        const feedback = document.getElementById('feedback');
+        if (isMatch) {
+            score++;
+            feedback.innerText = "✅ 正確！";
+            feedback.style.color = "#2ecc71";
         } else {
-            // 結算畫面
-            document.querySelector('.card').innerHTML = `
-                <h2>挑戰完成！</h2>
-                <p style="font-size: 1.5em; margin: 20px 0;">你答對了 <strong>${score}</strong> 題，答錯了 <strong>${5 - score}</strong> 題。</p>
-                <button onclick="location.reload()" style="background:#c5a059;">重新挑戰</button>
-            `;
+            feedback.innerText = "❌ 錯誤！";
+            feedback.style.color = "#e74c3c";
         }
+
+        // 延遲 1 秒後自動跳轉，讓員工看清結果
+        setTimeout(() => {
+            currentIdx++;
+            feedback.innerText = "";
+            if (currentIdx < 5) {
+                document.getElementById('card-title').innerText = gamePool[currentIdx].cardName;
+                document.getElementById('card-img').src = gamePool[currentIdx].imgSrc;
+                document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                document.querySelector('.card').innerHTML = `
+                    <h2>挑戰完成！</h2>
+                    <p style="font-size: 1.5em;">你的得分：<strong>${score} / 5</strong></p>
+                    <button onclick="location.reload()" style="background:#c5a059;">重新挑戰</button>
+                `;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }, 1000);
     }
 </script>
 </body>
