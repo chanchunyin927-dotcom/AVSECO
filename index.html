@@ -63,6 +63,13 @@
         { cardName: "杏色通行證", imgSrc: "杏證.png", correct: [3] }
     ];
 
+    // 建立選項 ID 對應文字的清單
+    const areaNames = {
+        0: "客運大樓", 1: "客運停機坪", 2: "貨運停機坪", 
+        3: "維修基地及長期停機坪", 4: "跑道及滑行道", 
+        5: "所有區域 (含跑道/滑行道)", 6: "所有區域 (不含跑道/滑行道)"
+    };
+
     let gamePool = [...allChallenges].sort(() => 0.5 - Math.random()).slice(0, 5);
     let currentIdx = 0;
     let score = 0;
@@ -80,15 +87,19 @@
         const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
         
         const feedback = document.getElementById('feedback');
+        
         if (isMatch) {
             score++;
             feedback.innerText = "✅ 正確！";
             feedback.style.color = "#2ecc71";
         } else {
-            feedback.innerText = "❌ 錯誤！";
+            // 找出正確答案的文字組合
+            const correctText = correct.map(id => areaNames[id]).join("、");
+            feedback.innerHTML = `<span style="font-size: 0.9em;">❌ 錯誤！正確為：${correctText}</span>`;
             feedback.style.color = "#e74c3c";
         }
 
+        // 延遲 2 秒（稍微延長一點讓員工看完正確答案）
         setTimeout(() => {
             currentIdx++;
             feedback.innerText = "";
@@ -98,7 +109,6 @@
                 document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
-                // 這裡加入了判斷邏輯
                 let message = score === 5 ? "🎉 完美表現！你是保安專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對機場保安非常重要。" : "不錯！繼續保持！");
                 if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
 
@@ -110,7 +120,7 @@
                 `;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
-        }, 1000);
+        }, 2000); // 這裡改成了 2000 毫秒 (2秒)，方便閱讀答案
     }
 </script>
 </body>
