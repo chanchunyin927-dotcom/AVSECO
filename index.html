@@ -4,72 +4,58 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>保安智能驗證系統</title>
+    <title>保安權限驗證系統</title>
     <style>
-        :root { --main-blue: #0a2540; --accent-gold: #c5a059; }
-        body { font-family: 'Helvetica Neue', sans-serif; background: #000; color: #fff; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; }
-        
-        /* 頂部掃描條動畫 */
-        .scan-line { position: absolute; top: 0; width: 100%; height: 2px; background: rgba(0,255,255,0.5); animation: scan 3s linear infinite; }
-        @keyframes scan { from { top: 0; } to { top: 100%; } }
-
-        #game-area { width: 90%; max-width: 500px; text-align: center; margin-top: 50px; }
-        .card-display { background: var(--main-blue); border: 2px solid var(--accent-gold); padding: 40px; border-radius: 15px; margin-bottom: 30px; font-size: 1.5em; letter-spacing: 2px; box-shadow: 0 0 20px rgba(197,160,89,0.3); }
-        
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        button { padding: 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        
-        /* 通行證顏色按鈕風格 */
-        .btn-purple { background: #8e44ad; }
-        .btn-red { background: #c0392b; }
-        .btn-green { background: #27ae60; }
-        .btn-yellow { background: #f1c40f; color: #000; }
-        
-        button:active { transform: scale(0.95); }
+        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
+        .card { background: #1a2a6c; border: 2px solid #c5a059; padding: 30px; border-radius: 20px; margin: 20px auto; max-width: 400px; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+        button { padding: 15px; border: 1px solid #555; border-radius: 10px; background: #333; color: white; cursor: pointer; transition: 0.3s; }
+        button.selected { background: #c5a059; border-color: #fff; }
+        #submit-btn { margin-top: 20px; padding: 15px 40px; background: #27ae60; border: none; font-size: 1.2em; border-radius: 50px; }
     </style>
 </head>
 <body>
-    <div class="scan-line"></div>
-    <div id="game-area">
-        <h1>禁區通行證驗證器</h1>
-        <div class="card-display" id="zone-display">加載中...</div>
-        <p>請選擇正確的通行證顏色進入：</p>
-        <div class="grid">
-            <button class="btn-purple" onclick="check(0)">紫色通行證</button>
-            <button class="btn-red" onclick="check(1)">紅色通行證</button>
-            <button class="btn-green" onclick="check(2)">綠色通行證</button>
-            <button class="btn-yellow" onclick="check(3)">黃色通行證</button>
+
+    <h1>通行證權限驗證</h1>
+    <div class="card">
+        <h2 id="card-name">黃色通行證</h2>
+        <p>此證可進入哪些區域？(可選多個)</p>
+        <div class="grid" id="area-options">
+            <button onclick="toggle(this)" data-id="0">客運大樓</button>
+            <button onclick="toggle(this)" data-id="1">停機坪</button>
+            <button onclick="toggle(this)" data-id="2">長期停坪區</button>
+            <button onclick="toggle(this)" data-id="3">貨運區</button>
         </div>
+        <button id="submit-btn" onclick="submit()">提交驗證</button>
     </div>
 
     <script>
-        const challenges = [
-            {zone: "行李處理大堂", ans: 0},
-            {zone: "停機坪區域", ans: 1},
-            {zone: "貨運控制中心", ans: 2},
-            {zone: "行政辦公大樓", ans: 3}
+        // 設定規則：證件名稱 與 其正確的區域代號
+        const rules = [
+            { card: "黃色通行證", correct: [0] }, 
+            { card: "橙色通行證", correct: [1, 2] }
         ];
-        let currentIdx = 0, score = 0;
-
-        function next() {
-            if(currentIdx >= 5) {
-                alert("挑戰完成！正確率: " + score + "/5");
-                location.reload(); return;
-            }
-            document.getElementById('zone-display').innerText = challenges[currentIdx % 4].zone;
+        
+        let currentIdx = 0;
+        
+        function toggle(btn) {
+            btn.classList.toggle('selected');
         }
 
-        function check(colorIdx) {
-            if(colorIdx === challenges[currentIdx % 4].ans) {
-                score++;
-                alert("✅ 驗證通過！");
-            } else {
-                alert("❌ 驗證失敗！進入受限區域！");
-            }
-            currentIdx++;
-            next();
+        function submit() {
+            const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
+            const correct = rules[currentIdx].correct;
+            
+            // 驗證邏輯：檢查選取的數量是否一致，且內容是否相符
+            const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
+            
+            alert(isMatch ? "✅ 正確！權限核准。" : "❌ 權限不符，請重新核對。");
+            
+            // 準備下一題
+            currentIdx = (currentIdx + 1) % rules.length;
+            document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
+            document.getElementById('card-name').innerText = rules[currentIdx].card;
         }
-        next();
     </script>
 </body>
 </html>
