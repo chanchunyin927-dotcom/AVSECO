@@ -4,71 +4,72 @@ HTML
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>保安挑戰 - 幸運轉盤</title>
+    <title>保安智能驗證系統</title>
     <style>
-        /* 手機優化：全螢幕背景與居中 */
-        body { 
-            font-family: 'Arial', sans-serif; 
-            margin: 0; padding: 20px; 
-            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d); 
-            color: white; 
-            display: flex; flex-direction: column; align-items: center; min-height: 100vh;
-        }
+        :root { --main-blue: #0a2540; --accent-gold: #c5a059; }
+        body { font-family: 'Helvetica Neue', sans-serif; background: #000; color: #fff; margin: 0; display: flex; flex-direction: column; align-items: center; min-height: 100vh; overflow: hidden; }
         
-        h1 { font-size: 1.5em; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+        /* 頂部掃描條動畫 */
+        .scan-line { position: absolute; top: 0; width: 100%; height: 2px; background: rgba(0,255,255,0.5); animation: scan 3s linear infinite; }
+        @keyframes scan { from { top: 0; } to { top: 100%; } }
 
-        /* 放大轉盤到 320px，適應手機寬度 */
-        .wheel-container { position: relative; margin: 40px auto; width: 320px; height: 320px; }
-        #wheel { 
-            width: 100%; height: 100%; border: 12px solid #fff; border-radius: 50%; 
-            background: conic-gradient(#e74c3c 0deg 72deg, #3498db 72deg 144deg, #2ecc71 144deg 216deg, #f39c12 216deg 288deg, #9b59b6 288deg 360deg);
-            transition: transform 4s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-            display: flex; align-items: center; justify-content: center; cursor: pointer;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-        }
-        .pointer { position: absolute; top: -30px; left: 50%; margin-left: -20px; color: #ffeb3b; font-size: 50px; }
-
-        #quiz-box { 
-            background: rgba(255,255,255,0.95); color: #333; padding: 25px; 
-            border-radius: 20px; width: 90%; max-width: 400px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-        }
-        button { 
-            display: block; width: 100%; padding: 15px; margin: 10px 0;
-            background: #2c3e50; color: white; border: none; border-radius: 10px; font-size: 1.1em;
-        }
+        #game-area { width: 90%; max-width: 500px; text-align: center; margin-top: 50px; }
+        .card-display { background: var(--main-blue); border: 2px solid var(--accent-gold); padding: 40px; border-radius: 15px; margin-bottom: 30px; font-size: 1.5em; letter-spacing: 2px; box-shadow: 0 0 20px rgba(197,160,89,0.3); }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        button { padding: 20px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        
+        /* 通行證顏色按鈕風格 */
+        .btn-purple { background: #8e44ad; }
+        .btn-red { background: #c0392b; }
+        .btn-green { background: #27ae60; }
+        .btn-yellow { background: #f1c40f; color: #000; }
+        
+        button:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
-
-    <h1>機場保安精英挑戰賽</h1>
-    <div class="wheel-container">
-        <div class="pointer">▼</div>
-        <div id="wheel" onclick="spin()">轉動抽題</div>
-    </div>
-    
-    <div id="quiz-box" class="hidden">
-        <h2 id="category-title" style="color: #c0392b;"></h2>
-        <p id="q-text" style="font-size: 1.2em; font-weight: bold;"></p>
-        <div id="options"></div>
+    <div class="scan-line"></div>
+    <div id="game-area">
+        <h1>禁區通行證驗證器</h1>
+        <div class="card-display" id="zone-display">加載中...</div>
+        <p>請選擇正確的通行證顏色進入：</p>
+        <div class="grid">
+            <button class="btn-purple" onclick="check(0)">紫色通行證</button>
+            <button class="btn-red" onclick="check(1)">紅色通行證</button>
+            <button class="btn-green" onclick="check(2)">綠色通行證</button>
+            <button class="btn-yellow" onclick="check(3)">黃色通行證</button>
+        </div>
     </div>
 
     <script>
-        const quizData = {
-            "禁區管制": [{q: "禁區門應保持？", a: ["開啟", "關閉"], correct: 1}],
-            "證件審核": [{q: "E字批註代表？", a: ["行李區", "辦公區"], correct: 0}]
-        };
-        // ... (保持原本的 spin 和 loadQuestion 邏輯)
-        function spin() {
-            const wheel = document.getElementById('wheel');
-            wheel.style.transform = `rotate(${Math.floor(Math.random() * 1000 + 2000)}deg)`;
-            setTimeout(() => {
-                document.querySelector('.wheel-container').classList.add('hidden');
-                document.getElementById('quiz-box').classList.remove('hidden');
-                loadQuestion();
-            }, 4000);
+        const challenges = [
+            {zone: "行李處理大堂", ans: 0},
+            {zone: "停機坪區域", ans: 1},
+            {zone: "貨運控制中心", ans: 2},
+            {zone: "行政辦公大樓", ans: 3}
+        ];
+        let currentIdx = 0, score = 0;
+
+        function next() {
+            if(currentIdx >= 5) {
+                alert("挑戰完成！正確率: " + score + "/5");
+                location.reload(); return;
+            }
+            document.getElementById('zone-display').innerText = challenges[currentIdx % 4].zone;
         }
-        // [在此加入你原本的 loadQuestion 邏輯]
+
+        function check(colorIdx) {
+            if(colorIdx === challenges[currentIdx % 4].ans) {
+                score++;
+                alert("✅ 驗證通過！");
+            } else {
+                alert("❌ 驗證失敗！進入受限區域！");
+            }
+            currentIdx++;
+            next();
+        }
+        next();
     </script>
 </body>
 </html>
