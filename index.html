@@ -60,9 +60,16 @@
         { cardName: "杏色通行證", imgSrc: "杏證.png", correct: [3] }
     ];
 
+    // --- 這裡確保每次打開頁面時都會重新隨機打亂 ---
     let gamePool = [...allChallenges].sort(() => 0.5 - Math.random()).slice(0, 5);
     let currentIdx = 0;
     let score = 0;
+
+    // --- 初始化第一張圖 ---
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('card-title').innerText = gamePool[0].cardName;
+        document.getElementById('card-img').src = gamePool[0].imgSrc;
+    });
 
     function toggle(btn) { btn.classList.toggle('selected'); }
 
@@ -71,7 +78,6 @@
         const correct = gamePool[currentIdx].correct;
         const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
         
-        // 顯示結果在介面上，不用彈窗
         const feedback = document.getElementById('feedback');
         if (isMatch) {
             score++;
@@ -82,13 +88,12 @@
             feedback.style.color = "#e74c3c";
         }
 
-        // 延遲 1 秒後自動跳轉，讓員工看清結果
         setTimeout(() => {
             currentIdx++;
             feedback.innerText = "";
             if (currentIdx < 5) {
                 document.getElementById('card-title').innerText = gamePool[currentIdx].cardName;
-                document.getElementById('card-img').src = gamePool[currentIdx].imgSrc;
+                document.getElementById('card-img').src = gamePool[currentIdx].imgSrc; // 確保這裡同步更新
                 document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
