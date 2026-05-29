@@ -99,7 +99,7 @@
     </div>
 
 <script>
-    const challenges = [
+    const allChallenges = [
         { cardName: "紅色通行證", imgSrc: "紅證.png", correct: [5] },
         { cardName: "紫色通行證", imgSrc: "紫證.png", correct: [6] },
         { cardName: "黃色通行證", imgSrc: "黃證.png", correct: [0] },
@@ -108,31 +108,40 @@
         { cardName: "藍色通行證", imgSrc: "藍證.png", correct: [2] },
         { cardName: "杏色通行證", imgSrc: "杏證.png", correct: [3] }
     ];
-    
+
+    // 隨機抽取 5 種證件
+    let gamePool = [...allChallenges].sort(() => 0.5 - Math.random()).slice(0, 5);
     let currentIdx = 0;
-    
+    let score = 0;
+
     function toggle(btn) {
         btn.classList.toggle('selected');
     }
 
     function submit() {
         const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
-        const correct = challenges[currentIdx].correct;
+        const correct = gamePool[currentIdx].correct;
         
+        // 檢查答案是否正確
         const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
+        if (isMatch) score++;
+
+        // 檢查是否還有下一題
+        currentIdx++;
         
-        if (isMatch) {
-            alert("✅ 正確！權限核准。");
+        if (currentIdx < 5) {
+            // 更新題目
+            document.getElementById('card-title').innerText = gamePool[currentIdx].cardName;
+            document.getElementById('card-img').src = gamePool[currentIdx].imgSrc;
+            document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
         } else {
-            alert("❌ 權限不符，請重新核對批註！");
+            // 結算畫面
+            document.querySelector('.card').innerHTML = `
+                <h2>挑戰完成！</h2>
+                <p style="font-size: 1.5em; margin: 20px 0;">你答對了 <strong>${score}</strong> 題，答錯了 <strong>${5 - score}</strong> 題。</p>
+                <button onclick="location.reload()" style="background:#c5a059;">重新挑戰</button>
+            `;
         }
-        
-        currentIdx = (currentIdx + 1) % challenges.length;
-        
-        document.getElementById('card-title').innerText = challenges[currentIdx].cardName;
-        document.getElementById('card-img').src = challenges[currentIdx].imgSrc;
-        
-        document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
     }
 </script>
 </body>
