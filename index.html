@@ -53,6 +53,7 @@
 
     const areaNames = { 0: "客運大樓", 1: "客運停機坪", 2: "貨運停機坪", 3: "維修基地及長期停機坪", 4: "跑道及滑行道", 5: "所有區域 (含跑道/滑行道)", 6: "所有區域 (不含跑道/滑行道)" };
 
+    // 【固定遊戲池】在遊戲開始前先隨機打亂並選好 5 題
     let gamePool = [...allChallenges].sort(() => 0.5 - Math.random()).slice(0, 5);
     let currentIdx = 0;
     let score = 0;
@@ -68,11 +69,11 @@
         if (isMatch) {
             score++;
             feedback.innerHTML = `<span style="color:#2ecc71;">✅ 正確！</span>`;
-            document.getElementById('question-area').style.display = 'none'; // 隱藏按鈕，避免重複提交
+            document.getElementById('question-area').style.display = 'none';
             setTimeout(nextQuestion, 1000);
         } else {
             const correctText = correct.map(id => areaNames[id]).join("、");
-            feedback.innerHTML = `<span style="color:#e74c3c;">❌ 錯誤！正確為：${correctText}</span>`;
+            feedback.innerHTML = `<span style="color:#e74c3c;">❌ 錯誤！正確答案為：${correctText}</span>`;
             document.getElementById('question-area').innerHTML = `<button id="submit-btn" onclick="nextQuestion()">下一題</button>`;
         }
     }
@@ -81,10 +82,16 @@
         currentIdx++;
         if (currentIdx < 5) {
             document.getElementById('feedback').innerText = "";
-            document.getElementById('card-title').innerText = gamePool[currentIdx].cardName;
-            document.getElementById('card-img').src = gamePool[currentIdx].imgSrc;
+            
+            // 【關鍵修改】確保讀取的是已經排好序的 gamePool
+            const nextQ = gamePool[currentIdx]; 
+            
+            document.getElementById('card-title').innerText = nextQ.cardName;
+            document.getElementById('card-img').src = nextQ.imgSrc;
+            
+            // 重新生成按鈕區塊
             document.getElementById('question-area').innerHTML = `
-                <p>此證可進入哪些區域？(可選多個)</p>
+                <p>此證可進入哪些區域？(可選多於一個答案)</p>
                 <div class="grid">${[0,1,2,3,4,5,6].map(id => `<button onclick="toggle(this)" data-id="${id}">${areaNames[id]}</button>`).join('')}</div>
                 <button id="submit-btn" onclick="submit()">提交答案</button>
             `;
@@ -96,7 +103,7 @@
     }
 
     function showResult() {
-        let message = score === 5 ? "🎉 完美表現！你是保安專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對機場保安非常重要。" : "不錯！繼續保持！");
+        let message = score === 5 ? "🎉 完美表現！你是通行證專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對航空保安非常重要。" : "不錯！繼續保持！");
         if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
         document.getElementById('main-card').innerHTML = `
             <h2>挑戰完成！</h2>
