@@ -40,16 +40,15 @@
     </div>
 
 <script>
-    // 定義所有關卡：imgSrc 必須與你上傳到 GitHub 的檔名完全一致
+    // 修正了逗號，讓所有關卡都能正確讀取
     const challenges = [
         { cardName: "紅色通行證", imgSrc: "紅證.png", correct: [5] },
         { cardName: "紫色通行證", imgSrc: "紫證.png", correct: [6] },
-        { cardName: "黃色通行證", imgSrc: "黃證.png", correct: [0] }
-        { cardName: "橙色通行證", imgSrc: "橙證.png", correct: [1,2,3] }
-    { cardName: "綠色通行證", imgSrc: "綠證.png", correct: [1,2,3,4] }
-    { cardName: "藍色通行證", imgSrc: "藍證.png", correct: [2] }
-    { cardName: "杏色通行證", imgSrc: "杏證.png", correct: [3] }
-        // 之後你可以繼續在這裡增加其他證件的規則
+        { cardName: "黃色通行證", imgSrc: "黃證.png", correct: [0] },
+        { cardName: "橙色通行證", imgSrc: "橙證.png", correct: [1,2,3] },
+        { cardName: "綠色通行證", imgSrc: "綠證.png", correct: [1,2,3,4] },
+        { cardName: "藍色通行證", imgSrc: "藍證.png", correct: [2] },
+        { cardName: "杏色通行證", imgSrc: "杏證.png", correct: [3] }
     ];
     
     let currentIdx = 0;
@@ -59,9 +58,11 @@
     }
 
     function submit() {
+        // 取得已選按鈕
         const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
         const correct = challenges[currentIdx].correct;
         
+        // 驗證邏輯
         const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
         
         if (isMatch) {
