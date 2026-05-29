@@ -20,22 +20,22 @@
 <body>
 
     <h1>機場禁區通行證基本知識小測試</h1>
-    <div class="card" id="main-card">
-        <img id="card-img" src="紅證.png" alt="通行證">
-        <h2 id="card-title">紅色通行證</h2>
-        <p>此證可進入哪些區域？(可選多個)</p>
-        
-        <div class="grid" id="area-options">
-            <button onclick="toggle(this)" data-id="0">客運大樓</button>
-            <button onclick="toggle(this)" data-id="1">客運停機坪</button>
-            <button onclick="toggle(this)" data-id="2">貨運停機坪</button>
-            <button onclick="toggle(this)" data-id="3">維修基地及長期停機坪</button>
-            <button onclick="toggle(this)" data-id="4">跑道及滑行道</button>
-            <button onclick="toggle(this)" data-id="5">所有區域 (含跑道/滑行道)</button>
-            <button onclick="toggle(this)" data-id="6">所有區域 (不含跑道/滑行道)</button>
+    <div id="game-container">
+        <div class="card" id="main-card">
+            <img id="card-img" src="紅證.png" alt="通行證">
+            <h2 id="card-title">紅色通行證</h2>
+            <p>此證可進入哪些區域？(可選多個)</p>
+            <div class="grid" id="area-options">
+                <button onclick="toggle(this)" data-id="0">客運大樓</button>
+                <button onclick="toggle(this)" data-id="1">客運停機坪</button>
+                <button onclick="toggle(this)" data-id="2">貨運停機坪</button>
+                <button onclick="toggle(this)" data-id="3">維修基地及長期停機坪</button>
+                <button onclick="toggle(this)" data-id="4">跑道及滑行道</button>
+                <button onclick="toggle(this)" data-id="5">所有區域 (含跑道/滑行道)</button>
+                <button onclick="toggle(this)" data-id="6">所有區域 (不含跑道/滑行道)</button>
+            </div>
+            <button id="submit-btn" onclick="submit()">提交答案</button>
         </div>
-        
-        <button id="submit-btn" onclick="submit()">提交答案</button>
     </div>
 
 <script>
@@ -57,25 +57,19 @@
 
     function toggle(btn) { btn.classList.toggle('selected'); }
 
-    function loadNext() {
-        currentIdx++;
-        if (currentIdx < 5) {
-            document.getElementById('card-title').innerText = gamePool[currentIdx].cardName;
-            document.getElementById('card-img').src = gamePool[currentIdx].imgSrc;
-            document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-            let message = score === 5 ? "🎉 完美表現！你是保安專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對機場保安非常重要。" : "不錯！繼續保持！");
-            if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
-
-            document.getElementById('main-card').innerHTML = `
-                <h2>挑戰完成！</h2>
-                <p style="font-size: 1.2em;">${message}</p>
-                <p style="font-size: 2em; margin: 20px 0;">得分：<strong>${score} / 5</strong></p>
-                <button onclick="location.reload()" style="background:#c5a059; padding: 15px; border-radius: 50px; border:none; color:white; width:100%;">重新挑戰</button>
-            `;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    // 重新渲染題目的函數 (把原本的結構塞回去)
+    function renderQuestion() {
+        document.getElementById('game-container').innerHTML = `
+            <div class="card" id="main-card">
+                <img id="card-img" src="${gamePool[currentIdx].imgSrc}" alt="通行證">
+                <h2 id="card-title">${gamePool[currentIdx].cardName}</h2>
+                <p>此證可進入哪些區域？(可選多個)</p>
+                <div class="grid" id="area-options">
+                    ${[0,1,2,3,4,5,6].map(id => `<button onclick="toggle(this)" data-id="${id}">${areaNames[id]}</button>`).join('')}
+                </div>
+                <button id="submit-btn" onclick="submit()">提交答案</button>
+            </div>
+        `;
     }
 
     function submit() {
@@ -85,21 +79,38 @@
         
         if (isMatch) {
             score++;
-            document.getElementById('main-card').innerHTML = `
-                <h2 style="color:#2ecc71;">✅ 正確！</h2>
-                <p>這一題回答正確。</p>
-                <button onclick="loadNext()" style="background:#27ae60; padding:15px; border-radius:12px; border:none; color:white; width:100%;">下一題</button>
-            `;
+            currentIdx++;
+            if (currentIdx < 5) renderQuestion();
+            else showResult();
         } else {
             const correctText = correct.map(id => areaNames[id]).join("、");
             document.getElementById('main-card').innerHTML = `
                 <h2 style="color:#e74c3c;">❌ 錯誤</h2>
                 <p>正確答案是：</p>
                 <div style="background:#444; padding:15px; border-radius:10px; margin:15px 0;">${correctText}</div>
-                <button onclick="loadNext()" style="background:#c5a059; padding:15px; border-radius:12px; border:none; color:white; width:100%;">下一題</button>
+                <button onclick="nextStep()" style="background:#c5a059; padding:15px; border-radius:12px; border:none; color:white; width:100%;">下一題</button>
             `;
         }
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function nextStep() {
+        currentIdx++;
+        if (currentIdx < 5) renderQuestion();
+        else showResult();
+    }
+
+    function showResult() {
+        let message = score === 5 ? "🎉 完美表現！你是保安專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對機場保安非常重要。" : "不錯！繼續保持！");
+        if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
+
+        document.getElementById('game-container').innerHTML = `
+            <div class="card">
+                <h2>挑戰完成！</h2>
+                <p style="font-size: 1.2em;">${message}</p>
+                <p style="font-size: 2em; margin: 20px 0;">得分：<strong>${score} / 5</strong></p>
+                <button onclick="location.reload()" style="background:#c5a059; padding:15px; border-radius:50px; border:none; color:white; width:100%;">重新挑戰</button>
+            </div>
+        `;
     }
 </script>
 </body>
