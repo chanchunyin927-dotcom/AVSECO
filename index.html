@@ -100,7 +100,12 @@
                 <button id="submit-btn" onclick="submit()">提交答案</button>
             `;
             document.getElementById('question-area').style.display = 'block';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            
+            // 延遲 50 毫秒捲動，確保瀏覽器已經繪製好新內容
+            setTimeout(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }, 50);
+            
         } else {
             showResult();
         }
@@ -109,12 +114,18 @@
     function showResult() {
         let message = score === 5 ? "🎉 完美表現！你是通行證專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對航空保安非常重要。" : "不錯！繼續保持！");
         if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
+        
         document.getElementById('main-card').innerHTML = `
             <h2>挑戰完成！</h2>
             <p style="font-size: 1.2em;">${message}</p>
             <p style="font-size: 2em; margin: 20px 0;">得分：<strong>${score} / 5</strong></p>
             <button onclick="location.reload()" style="background:#c5a059; padding:15px; border-radius:50px; border:none; color:white; width:100%;">重新挑戰</button>
         `;
+        
+        // 同樣延遲 50 毫秒確保結算頁面正確捲動
+        setTimeout(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }, 50);
     }
 </script>
 </body>
