@@ -37,7 +37,7 @@
         <h2 id="card-title">紅色通行證</h2>
         <div id="feedback"></div>
         <div id="question-area">
-            <p>此證可進入哪些區域？(可選多個)</p>
+            <p style="font-size: 0.9em; white-space: nowrap; margin-bottom: 15px;">此證可進入哪些區域？(可選多於一個答案)</p>
             <div class="grid" id="area-options">
                 <button onclick="toggle(this)" data-id="0">客運大樓</button>
                 <button onclick="toggle(this)" data-id="1">客運停機坪</button>
@@ -106,9 +106,9 @@
             document.getElementById('card-img').src = nextQ.imgSrc;
             
             document.getElementById('question-area').innerHTML = `
-                <p>此證可進入哪些區域？(可選多於一個答案)</p>
-                <div class="grid">${[0,1,2,3,4,5,6].map(id => `<button onclick="toggle(this)" data-id="${id}">${areaNames[id]}</button>`).join('')}</div>
-                <button id="submit-btn" onclick="submit()">提交答案</button>
+    <p style="font-size: 0.9em; white-space: nowrap; margin-bottom: 15px;">此證可進入哪些區域？(可選多於一個答案)</p>
+    <div class="grid">${[0,1,2,3,4,5,6].map(id => `<button onclick="toggle(this)" data-id="${id}">${areaNames[id]}</button>`).join('')}</div>
+    <button id="submit-btn" onclick="submit()">提交答案</button>
             `;
             document.getElementById('question-area').style.display = 'block';
             
@@ -125,7 +125,7 @@
     function showResult() {
         // 設定訊息，如果滿分則加上領取禮品提示
         let message = score === 5 ? "🎉 完美表現！你是通行證專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對航空保安非常重要。" : "不錯！繼續保持！");
-        let giftText = score === 5 ? `<p style="color:#f1c40f; font-size: 1.1em; margin-top:10px;">🎁 請向工作人員領取精美小禮品一份！</p>` : "";
+        let giftText = score === 5 ? `<p style="color:#f1c40f; font-size: 0.95em; margin-top:10px; white-space: nowrap;">🎁 請向工作人員領取精美小禮品一份！</p>` : "";
 
         if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
         
