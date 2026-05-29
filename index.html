@@ -5,15 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>機場禁區通行證基本知識小測試</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #000; color: #fff; text-align: center; padding: 20px; }
-        .card { background: #1a2a6c; border: 2px solid #c5a059; padding: 30px; border-radius: 20px; margin: 20px auto; max-width: 400px; }
-        
-        /* 統一圖片樣式 */
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            margin: 0; padding: 20px;
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white; 
+            text-align: center; 
+            min-height: 100vh;
+        }
+
+        .card { 
+            background: rgba(26, 42, 108, 0.85); 
+            border: 2px solid #c5a059; 
+            padding: 30px; 
+            border-radius: 20px; 
+            margin: 20px auto; 
+            max-width: 400px;
+            backdrop-filter: blur(5px);
+        }
+
         #card-img { width: 100%; max-width: 220px; border-radius: 12px; margin-bottom: 20px; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
-        
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
         button { padding: 15px; border: 1px solid #555; border-radius: 10px; background: #333; color: white; cursor: pointer; transition: 0.3s; }
-        button.selected { background: #c5a059; border-color: #fff; font-weight: bold; }
+        
+        /* 加入你想要的金色光暈效果 */
+        button.selected { 
+            background: #c5a059; 
+            border-color: #fff; 
+            font-weight: bold; 
+            box-shadow: 0 0 15px #c5a059;
+            transform: scale(1.05);
+        }
+        
         #submit-btn { margin-top: 25px; padding: 15px 40px; background: #27ae60; border: none; font-size: 1.2em; border-radius: 50px; width: 100%; }
     </style>
 </head>
@@ -40,7 +66,6 @@
     </div>
 
 <script>
-    // 修正了逗號，讓所有關卡都能正確讀取
     const challenges = [
         { cardName: "紅色通行證", imgSrc: "紅證.png", correct: [5] },
         { cardName: "紫色通行證", imgSrc: "紫證.png", correct: [6] },
@@ -58,11 +83,9 @@
     }
 
     function submit() {
-        // 取得已選按鈕
         const selected = Array.from(document.querySelectorAll('.selected')).map(b => parseInt(b.dataset.id));
         const correct = challenges[currentIdx].correct;
         
-        // 驗證邏輯
         const isMatch = selected.length === correct.length && selected.every(val => correct.includes(val));
         
         if (isMatch) {
@@ -71,14 +94,11 @@
             alert("❌ 權限不符，請重新核對批註！");
         }
         
-        // 切換到下一關
         currentIdx = (currentIdx + 1) % challenges.length;
         
-        // 更新畫面
         document.getElementById('card-title').innerText = challenges[currentIdx].cardName;
         document.getElementById('card-img').src = challenges[currentIdx].imgSrc;
         
-        // 重置按鈕
         document.querySelectorAll('button').forEach(b => b.classList.remove('selected'));
     }
 </script>
