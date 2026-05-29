@@ -123,17 +123,20 @@
     }
 
     function showResult() {
+        // 設定訊息，如果滿分則加上領取禮品提示
         let message = score === 5 ? "🎉 完美表現！你是通行證專家！" : (score <= 3 ? "💪 再加把勁！熟習各區域權限對航空保安非常重要。" : "不錯！繼續保持！");
+        let giftText = score === 5 ? `<p style="color:#f1c40f; font-size: 1.1em; margin-top:10px;">🎁 請向工作人員領取精美小禮品一份！</p>` : "";
+
         if (score === 5) confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
         
         document.getElementById('main-card').innerHTML = `
             <h2>挑戰完成！</h2>
             <p style="font-size: 1.2em;">${message}</p>
+            ${giftText}
             <p style="font-size: 2em; margin: 20px 0;">得分：<strong>${score} / 5</strong></p>
-            <button onclick="location.reload()" style="background:#c5a059; padding:15px; border-radius:50px; border:none; color:white; width:100%;">重新挑戰</button>
+            <button onclick="location.reload()" style="background:#c5a059; padding:15px; border-radius:50px; border:none; color:white; width:100%; cursor:pointer;">重新挑戰</button>
         `;
         
-        // 同樣延遲 50 毫秒確保結算頁面正確捲動
         setTimeout(() => {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }, 50);
